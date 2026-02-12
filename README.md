@@ -1,14 +1,14 @@
-Learning Linux Forensics: Tracking the 'regmod' Module
-Introduction (Jedha Cybersecurity Course)
-As part of my training in the Jedha Cybersecurity course, I performed my first investigation into the Linux Kernel. The goal was to find a "hidden" module that shouldn't be there and understand how it works. This report is a detailed log of the commands I used and what I learned as a beginner in this field.
+# Learning Linux Forensics: Tracking the 'regmod' Module
 
-Step 1: Hunting the Secret Module
-I started by looking for modules that didn't have a digital signature (the "seal of authenticity" in Linux). Since dmesg gave me a "Permission Denied" error at first, I learned that I must use sudo to get administrative privileges.
+## Introduction (Jedha Cybersecurity Course)
+As part of my training in the **Jedha Cybersecurity course**, I performed my first investigation into the Linux Kernel. The goal was to find a "hidden" module that shouldn't be there and understand how it works. This report is a detailed log of the commands I used and what I learned as a beginner in this field.
+
+## Step 1: Hunting the Secret Module
+I started by looking for modules that didn't have a digital signature. Since `dmesg` gave me a "Permission Denied" error at first, I learned that I must use `sudo` to get administrative privileges.
 
 I used this long command to filter everything:
 
-Bash
-# This looks at all modules and only shows the ones without a 'signer' tag
+```bash
 lsmod | awk '{print $1}' | grep -v "Module" | xargs -I {} sh -c 'modinfo {} | grep -q "signer" || echo {}'
 Discovery: The module name is regmod.
 
