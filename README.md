@@ -15,7 +15,7 @@ To identify unsigned modules, I used the following command:
 
 lsmod | awk '{print $1}' | grep -v "Module" | xargs -I {} sh -c 'modinfo {} | grep -q "signer" || echo {}'
 
-# Discovery
+### Discovery
 
 The suspicious module identified was named regmod.
 
@@ -26,7 +26,7 @@ This is similar to checking a module’s passport.
 
 modinfo regmod
 
-Findings
+### Findings
 
 Author: Anne Onyme
 
@@ -43,7 +43,7 @@ I searched for readable strings inside the kernel object file:
 
 strings /lib/modules/6.11.0-21-generic/extra/regmod.ko | grep "open"
 
-## Final Result
+#### Final Result
 
 The string opensesame was discovered — the module’s magic word.
 
@@ -56,7 +56,6 @@ sudo insmod /lib/modules/6.11.0-21-generic/extra/regmod.ko unlock_code=opensesam
 Checking Kernel Logs
 sudo dmesg | tail
 
-
 # Observed output:
 
 [ 3246.708144] regmod: UNLOCKED! flag_part_three: treasure_hunt}
@@ -67,7 +66,6 @@ Additional information appeared when the module was removed.
 
 sudo rmmod regmod
 sudo dmesg | tail -n 5
-
 
 # Observed output:
 
