@@ -13,6 +13,7 @@ Initially, running dmesg returned a Permission Denied error, which taught me tha
 
 To identify unsigned modules, I used the following command:
 
+```bash
 lsmod | awk '{print $1}' | grep -v "Module" | xargs -I {} sh -c 'modinfo {} | grep -q "signer" || echo {}'
 
 ### Discovery
