@@ -8,14 +8,14 @@ I started by looking for modules that didn't have a digital signature. Since `dm
 
 I used this long command to filter everything:
 
-```bash
+```bash `
 lsmod | awk '{print $1}' | grep -v "Module" | xargs -I {} sh -c 'modinfo {} | grep -q "signer" || echo {}'
 Discovery: The module name is regmod.
 
 Step 2: Investigating the Module's "ID Card"
 Once I had the name, I used modinfo to see its metadata. This is like looking at the module's passport.
 
-Bash
+```bash `
 modinfo regmod
 What I found:
 
@@ -30,7 +30,7 @@ Parameter found: I saw a field called unlock_code. This looked like a password w
 ### Step 3: Finding the Password (Reverse Engineering)
 I searched for the word "open" because the hints suggested a code like "open...". 
 
-```bash
+```bash `
 strings /lib/modules/6.11.0-21-generic/extra/regmod.ko | grep "open"
 Result: I found the word opensesame. This was the "magic word"!
 
@@ -39,13 +39,13 @@ Now I had to load the module using that specific password to see what happened.
 
 Loading the module with the parameter:
 
-Bash
+```bash `
 sudo insmod /lib/modules/6.11.0-21-generic/extra/regmod.ko unlock_code=opensesame
 Checking the logs: I used dmesg to read the system messages and saw: [ 3246.708144] regmod: UNLOCKED! flag_part_three: treasure_hunt}
 
 Unloading the module: The instructions said to check the logs again when removing it:
 
-Bash
+```bash `
 sudo rmmod regmod
 sudo dmesg | tail -n 5
 [ 3669.321164] regmod: flag_part_two: _modules_
