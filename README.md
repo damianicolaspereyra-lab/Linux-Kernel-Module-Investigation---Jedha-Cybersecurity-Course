@@ -14,7 +14,8 @@ Initially, running dmesg returned a Permission Denied error, which taught me tha
 To identify unsigned modules, I used the following command:
 
 ```bash
-lsmod | awk '{print $1}' | grep -v "Module" | xargs -I {} sh -c 'modinfo {} | grep -q "signer" || echo {}'```
+lsmod | awk '{print $1}' | grep -v "Module" | xargs -I {} sh -c 'modinfo {} | grep -q "signer" || echo {}'
+```
 
 ### Discovery
 
@@ -24,8 +25,9 @@ The suspicious module identified was named regmod.
 
 Once the module name was known, I inspected its metadata using modinfo.
 This is similar to checking a module’s passport.
-
+```bash
 modinfo regmod
+```
 
 ### Findings
 
@@ -38,10 +40,10 @@ Dependencies: Uses the bluetooth module (unexpected for a regular kernel module)
 Parameter: unlock_code (suggesting a password-protected behavior)
 
 ## Step 3: Finding the Password (Reverse Engineering)
-
+```bash
 Hints suggested the password might start with "open...".
 I searched for readable strings inside the kernel object file:
-
+```
 strings /lib/modules/6.11.0-21-generic/extra/regmod.ko | grep "open"
 
 #### Final Result
@@ -51,8 +53,9 @@ The string opensesame was discovered — the module’s magic word.
 ## Step 4: Cracking the Code and Getting the Flag
 
 With the password identified, I loaded the module while passing the required parameter.
-
+```bash
 sudo insmod /lib/modules/6.11.0-21-generic/extra/regmod.ko unlock_code=opensesame
+```
 
 Checking Kernel Logs
 sudo dmesg | tail
@@ -64,10 +67,10 @@ sudo dmesg | tail
 ## Step 5: Unloading the Module
 
 Additional information appeared when the module was removed.
-
+```bash
 sudo rmmod regmod
 sudo dmesg | tail -n 5
-
+```
 # Observed output:
 
 [ 3669.321164] regmod: flag_part_two: _modules_
